@@ -17,7 +17,7 @@ export default function DancingWojaks() {
   useEffect(() => {
     // Create multiple instances of the soyjak dance GIF
     const numWojaks = 6;
-    const initialWojaks = Array.from({ length: numWojaks }, (_, index) => ({
+    const initialWojaks = Array.from({ length: numWojaks }, () => ({
       src: soyjakDance,
       x: Math.random() * (window.innerWidth - 250),
       y: Math.random() * (window.innerHeight - 250),

@@ -48,7 +48,7 @@ export default function LiveChat() {
 
     const messagesRef_db = ref(database, 'messages');
     
-    const unsubscribe = onValue(messagesRef_db, (snapshot) => {
+    onValue(messagesRef_db, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const messagesList: Message[] = Object.entries(data).map(([id, msg]: [string, any]) => ({
@@ -64,7 +64,7 @@ export default function LiveChat() {
     });
 
     return () => {
-      off(messagesRef_db);
+      off(messagesRef_db, 'value');
     };
   }, []);
 
