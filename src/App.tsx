@@ -7,6 +7,7 @@ import LightFlares from './components/LightFlares';
 import MetallicButton from './components/MetallicButton';
 import Intro from './components/Intro';
 import LiveChat from './components/LiveChat';
+import DancingWojaks from './components/DancingWojaks';
 import musicFile from './Lil_uzi_vert_-_Just_wanna_rock_(mp3.pm).mp3';
 import './App.css';
 
@@ -55,6 +56,7 @@ function App() {
           <StarOfDavid accelerate={isTransitioning} />
           <DiamondSparkles accelerate={isTransitioning} />
           <LightFlares accelerate={isTransitioning} />
+          {showMain && <DancingWojaks />}
         </>
       )}
       

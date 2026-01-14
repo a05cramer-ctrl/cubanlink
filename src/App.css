@@ -796,6 +796,33 @@ body {
   cursor: none;
 }
 
+/* Dancing Wojaks Background */
+.dancing-wojaks-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.dancing-wojak {
+  image-rendering: auto;
+  will-change: transform;
+  animation: wojak-float 3s ease-in-out infinite;
+}
+
+@keyframes wojak-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
 /* Live Chat */
 .live-chat-container {
   position: fixed;
