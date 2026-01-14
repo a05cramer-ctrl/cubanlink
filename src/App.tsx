@@ -90,7 +90,13 @@ function App() {
 
             <div className="button-group">
               <MetallicButton>BUY NOW</MetallicButton>
-              <MetallicButton>JOIN COMMUNITY</MetallicButton>
+              <MetallicButton href="https://x.com/LinkCuban45020" target="_blank" rel="noopener noreferrer">JOIN COMMUNITY</MetallicButton>
+            </div>
+
+            <div className="footer-text">
+              <a href="https://t.me/cubanlink" target="_blank" rel="noopener noreferrer">
+                <p>Ca:</p>
+              </a>
             </div>
           </main>
           

@@ -399,6 +399,8 @@
     inset 0 -2px 5px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
   transform: perspective(1000px) rotateX(0deg);
+  display: inline-block;
+  text-decoration: none;
 }
 
 .metallic-button-shine {
@@ -1126,4 +1128,28 @@ body {
   .chat-toggle-text {
     display: none;
   }
+}
+
+/* Footer Text */
+.footer-text {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.footer-text a {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer-text a:hover {
+  opacity: 0.8;
+}
+
+.footer-text p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.1em;
+  margin: 0;
+  cursor: pointer;
 }
