@@ -18,7 +18,7 @@ function App() {
   const handleIntroEnter = () => {
     setIsTransitioning(true);
     
-    // Start music at 19 seconds INSTANTLY - no delay
+    // Start music at 19.5 seconds INSTANTLY - no delay
     if (!audioRef.current) {
       audioRef.current = new Audio(musicFile);
       audioRef.current.volume = 1.0; // Maximum volume (0.0 to 1.0)
@@ -27,7 +27,7 @@ function App() {
     }
     
     // Set time and play immediately
-    audioRef.current.currentTime = 19;
+    audioRef.current.currentTime = 19.5;
     const playPromise = audioRef.current.play();
     if (playPromise !== undefined) {
       playPromise.catch((error) => {
