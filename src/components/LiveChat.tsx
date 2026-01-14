@@ -21,7 +21,7 @@ try {
   app = initializeApp(firebaseConfig);
   database = getDatabase(app);
 } catch (error) {
-  console.warn('Firebase initialization failed, using mock chat:', error);
+  console.warn('Firebase initialization failed, using localStorage:', error);
 }
 
 interface Message {
@@ -41,63 +41,23 @@ export default function LiveChat() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesRef = useRef<Message[]>([]);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
-  // Load messages from localStorage on mount
+  // Load messages on mount
   useEffect(() => {
     if (!database) {
-      const storedMessages = localStorage.getItem('chat-messages');
-      if (storedMessages) {
-        try {
-          const parsed = JSON.parse(storedMessages);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+      // Use localStorage
+      try {
+        const stored = localStorage.getItem('chat-messages');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
             setMessages(parsed);
-            messagesRef.current = parsed;
           }
-        } catch (e) {
-          console.error('Failed to parse stored messages', e);
         }
+      } catch (e) {
+        console.error('Error loading messages:', e);
       }
-    }
-  }, [database]);
-
-  useEffect(() => {
-    if (!database) {
-      // Fallback: Use localStorage with storage events for cross-tab sync
-      const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === 'chat-messages' && e.newValue) {
-          try {
-            const parsed = JSON.parse(e.newValue);
-            messagesRef.current = parsed;
-            setMessages(parsed);
-          } catch (e) {
-            // Ignore parse errors
-          }
-        }
-      };
-
-      // Polling fallback for same-tab updates
-      const interval = setInterval(() => {
-        const storedMessages = localStorage.getItem('chat-messages');
-        if (storedMessages) {
-          try {
-            const parsed = JSON.parse(storedMessages);
-            if (JSON.stringify(parsed) !== JSON.stringify(messagesRef.current)) {
-              messagesRef.current = parsed;
-              setMessages(parsed);
-            }
-          } catch (e) {
-            // Ignore parse errors
-          }
-        }
-      }, 500);
-
-      window.addEventListener('storage', handleStorageChange);
-      return () => {
-        clearInterval(interval);
-        window.removeEventListener('storage', handleStorageChange);
-      };
     } else {
       // Use Firebase
       const messagesRef_db = ref(database, 'messages');
@@ -112,11 +72,8 @@ export default function LiveChat() {
             user: msg.user || 'Anonymous'
           }));
           messagesList.sort((a, b) => a.timestamp - b.timestamp);
-          messagesRef.current = messagesList.slice(-50); // Keep last 50 messages
-          setMessages(messagesRef.current);
+          setMessages(messagesList.slice(-50));
         } else {
-          // No data in Firebase, initialize empty
-          messagesRef.current = [];
           setMessages([]);
         }
       });
@@ -125,49 +82,38 @@ export default function LiveChat() {
         off(messagesRef_db, 'value');
       };
     }
-  }, [database]);
+  }, []);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !userName.trim()) return;
 
     const newMessage: Message = {
       id: `msg-${Date.now()}-${Math.random()}`,
       text: inputText.trim(),
       timestamp: Date.now(),
-      user: userName || `User${Math.floor(Math.random() * 10000)}`
+      user: userName.trim()
     };
 
     if (database) {
-      // Use Firebase if available
+      // Firebase
       push(ref(database, 'messages'), {
         text: newMessage.text,
         timestamp: newMessage.timestamp,
         user: newMessage.user
       });
     } else {
-      // Fallback: Use localStorage - use current messages state
-      setMessages((currentMessages) => {
-        const updatedMessages = [...currentMessages, newMessage].slice(-50);
-        messagesRef.current = updatedMessages;
-        localStorage.setItem('chat-messages', JSON.stringify(updatedMessages));
-        
-        // Broadcast to other tabs/windows
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: 'chat-messages',
-          newValue: JSON.stringify(updatedMessages)
-        }));
-        
-        return updatedMessages;
-      });
+      // localStorage - add to current messages
+      const updated = [...messages, newMessage].slice(-50);
+      setMessages(updated);
+      localStorage.setItem('chat-messages', JSON.stringify(updated));
     }
     
     setInputText('');
@@ -196,7 +142,6 @@ export default function LiveChat() {
         const newX = e.clientX - dragStart.x;
         const newY = e.clientY - dragStart.y;
         
-        // Constrain to viewport
         const maxX = window.innerWidth - chatWindowRef.current.offsetWidth;
         const maxY = window.innerHeight - chatWindowRef.current.offsetHeight;
         
@@ -214,7 +159,7 @@ export default function LiveChat() {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
-      document.body.style.userSelect = 'none'; // Prevent text selection while dragging
+      document.body.style.userSelect = 'none';
     } else {
       document.body.style.userSelect = '';
     }
@@ -298,7 +243,7 @@ export default function LiveChat() {
               messages.map((msg) => (
                 <div key={msg.id} className="chat-message">
                   <div className="chat-message-header">
-                    <span className="chat-user">{msg.user}</span>
+                    <span className="chat-user">{msg.user || 'Anonymous'}</span>
                     <span className="chat-time">{formatTime(msg.timestamp)}</span>
                   </div>
                   <div className="chat-text">{msg.text}</div>

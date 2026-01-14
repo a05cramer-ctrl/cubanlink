@@ -6,7 +6,7 @@ import DiamondSparkles from './components/DiamondSparkles';
 import LightFlares from './components/LightFlares';
 import MetallicButton from './components/MetallicButton';
 import Intro from './components/Intro';
-import LiveChat from './components/LiveChat';
+// import LiveChat from './components/LiveChat';
 import DancingWojaks from './components/DancingWojaks';
 import musicFile from './Lil_uzi_vert_-_Just_wanna_rock_(mp3.pm).mp3';
 import './App.css';
@@ -90,11 +90,11 @@ function App() {
 
             <div className="button-group">
               <MetallicButton>BUY NOW</MetallicButton>
-              <MetallicButton>JOIN TELEGRAM</MetallicButton>
+              <MetallicButton>JOIN COMMUNITY</MetallicButton>
             </div>
           </main>
           
-          <LiveChat />
+          {/* <LiveChat /> */}
         </>
       )}
     </div>

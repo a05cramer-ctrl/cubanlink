@@ -1015,6 +1015,9 @@ body {
   border-radius: 10px;
   padding: 0.6rem 0.75rem;
   animation: message-appear 0.3s ease-out;
+  opacity: 1;
+  visibility: visible;
+  display: block;
 }
 
 @keyframes message-appear {
