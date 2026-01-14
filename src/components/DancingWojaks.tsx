@@ -21,11 +21,11 @@ export default function DancingWojaks() {
       src: soyjakDance,
       x: Math.random() * (window.innerWidth - 250),
       y: Math.random() * (window.innerHeight - 250),
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
+      vx: (Math.random() - 0.5) * 0.15, // Slower movement
+      vy: (Math.random() - 0.5) * 0.15, // Slower movement
       size: Math.random() * 100 + 150, // 150-250px (bigger)
       rotation: Math.random() * 360,
-      rotationSpeed: (Math.random() - 0.5) * 2,
+      rotationSpeed: (Math.random() - 0.5) * 0.8, // Slower rotation
     }));
 
     setWojaks(initialWojaks);
@@ -49,11 +49,11 @@ export default function DancingWojaks() {
           
           // Add slight random direction changes for more organic movement
           if (Math.random() > 0.98) {
-            wojak.vx += (Math.random() - 0.5) * 0.1;
-            wojak.vy += (Math.random() - 0.5) * 0.1;
-            // Limit max speed
-            wojak.vx = Math.max(-1, Math.min(1, wojak.vx));
-            wojak.vy = Math.max(-1, Math.min(1, wojak.vy));
+            wojak.vx += (Math.random() - 0.5) * 0.05;
+            wojak.vy += (Math.random() - 0.5) * 0.05;
+            // Limit max speed (slower)
+            wojak.vx = Math.max(-0.3, Math.min(0.3, wojak.vx));
+            wojak.vy = Math.max(-0.3, Math.min(0.3, wojak.vy));
           }
 
           // Keep rotation between 0-360
