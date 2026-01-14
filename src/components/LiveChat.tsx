@@ -36,6 +36,7 @@ export default function LiveChat() {
   const [inputText, setInputText] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [userName, setUserName] = useState('');
+  const [nameInputValue, setNameInputValue] = useState('');
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -43,30 +44,88 @@ export default function LiveChat() {
   const messagesRef = useRef<Message[]>([]);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
+  // Load messages from localStorage on mount
   useEffect(() => {
-    if (!database) return;
-
-    const messagesRef_db = ref(database, 'messages');
-    
-    onValue(messagesRef_db, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const messagesList: Message[] = Object.entries(data).map(([id, msg]: [string, any]) => ({
-          id,
-          text: msg.text,
-          timestamp: msg.timestamp,
-          user: msg.user || 'Anonymous'
-        }));
-        messagesList.sort((a, b) => a.timestamp - b.timestamp);
-        messagesRef.current = messagesList.slice(-50); // Keep last 50 messages
-        setMessages(messagesRef.current);
+    if (!database) {
+      const storedMessages = localStorage.getItem('chat-messages');
+      if (storedMessages) {
+        try {
+          const parsed = JSON.parse(storedMessages);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMessages(parsed);
+            messagesRef.current = parsed;
+          }
+        } catch (e) {
+          console.error('Failed to parse stored messages', e);
+        }
       }
-    });
+    }
+  }, [database]);
 
-    return () => {
-      off(messagesRef_db, 'value');
-    };
-  }, []);
+  useEffect(() => {
+    if (!database) {
+      // Fallback: Use localStorage with storage events for cross-tab sync
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === 'chat-messages' && e.newValue) {
+          try {
+            const parsed = JSON.parse(e.newValue);
+            messagesRef.current = parsed;
+            setMessages(parsed);
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      };
+
+      // Polling fallback for same-tab updates
+      const interval = setInterval(() => {
+        const storedMessages = localStorage.getItem('chat-messages');
+        if (storedMessages) {
+          try {
+            const parsed = JSON.parse(storedMessages);
+            if (JSON.stringify(parsed) !== JSON.stringify(messagesRef.current)) {
+              messagesRef.current = parsed;
+              setMessages(parsed);
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      }, 500);
+
+      window.addEventListener('storage', handleStorageChange);
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('storage', handleStorageChange);
+      };
+    } else {
+      // Use Firebase
+      const messagesRef_db = ref(database, 'messages');
+      
+      onValue(messagesRef_db, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const messagesList: Message[] = Object.entries(data).map(([id, msg]: [string, any]) => ({
+            id,
+            text: msg.text,
+            timestamp: msg.timestamp,
+            user: msg.user || 'Anonymous'
+          }));
+          messagesList.sort((a, b) => a.timestamp - b.timestamp);
+          messagesRef.current = messagesList.slice(-50); // Keep last 50 messages
+          setMessages(messagesRef.current);
+        } else {
+          // No data in Firebase, initialize empty
+          messagesRef.current = [];
+          setMessages([]);
+        }
+      });
+
+      return () => {
+        off(messagesRef_db, 'value');
+      };
+    }
+  }, [database]);
 
   useEffect(() => {
     scrollToBottom();
@@ -78,15 +137,39 @@ export default function LiveChat() {
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || !database) return;
+    if (!inputText.trim()) return;
 
-    const newMessage = {
+    const newMessage: Message = {
+      id: `msg-${Date.now()}-${Math.random()}`,
       text: inputText.trim(),
       timestamp: Date.now(),
       user: userName || `User${Math.floor(Math.random() * 10000)}`
     };
 
-    push(ref(database, 'messages'), newMessage);
+    if (database) {
+      // Use Firebase if available
+      push(ref(database, 'messages'), {
+        text: newMessage.text,
+        timestamp: newMessage.timestamp,
+        user: newMessage.user
+      });
+    } else {
+      // Fallback: Use localStorage - use current messages state
+      setMessages((currentMessages) => {
+        const updatedMessages = [...currentMessages, newMessage].slice(-50);
+        messagesRef.current = updatedMessages;
+        localStorage.setItem('chat-messages', JSON.stringify(updatedMessages));
+        
+        // Broadcast to other tabs/windows
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'chat-messages',
+          newValue: JSON.stringify(updatedMessages)
+        }));
+        
+        return updatedMessages;
+      });
+    }
+    
     setInputText('');
   };
 
@@ -176,14 +259,35 @@ export default function LiveChat() {
 
           {!userName && (
             <div className="chat-name-input-container">
-              <input
-                type="text"
-                placeholder="Enter your name..."
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                className="chat-name-input"
-                maxLength={20}
-              />
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const name = nameInputValue.trim();
+                  if (name) {
+                    setUserName(name);
+                    setNameInputValue('');
+                  }
+                }}
+                style={{ display: 'flex', gap: '0.5rem', width: '100%' }}
+              >
+                <input
+                  type="text"
+                  placeholder="Enter your name..."
+                  value={nameInputValue}
+                  onChange={(e) => setNameInputValue(e.target.value)}
+                  className="chat-name-input"
+                  maxLength={20}
+                  autoFocus
+                  style={{ flex: 1 }}
+                />
+                <button
+                  type="submit"
+                  className="chat-name-submit"
+                  disabled={!nameInputValue.trim()}
+                >
+                  SET
+                </button>
+              </form>
             </div>
           )}
 

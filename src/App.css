@@ -942,7 +942,6 @@ body {
 }
 
 .chat-name-input {
-  width: 100%;
   padding: 0.6rem 0.75rem;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -950,6 +949,31 @@ body {
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   font-size: 0.85rem;
+}
+
+.chat-name-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.chat-name-submit {
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 50%, #ffffff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  color: #000000;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.chat-name-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 .chat-name-input::placeholder {
