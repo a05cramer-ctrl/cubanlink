@@ -6,6 +6,7 @@ import DiamondSparkles from './components/DiamondSparkles';
 import LightFlares from './components/LightFlares';
 import MetallicButton from './components/MetallicButton';
 import Intro from './components/Intro';
+import LiveChat from './components/LiveChat';
 import musicFile from './Lil_uzi_vert_-_Just_wanna_rock_(mp3.pm).mp3';
 import './App.css';
 
@@ -90,6 +91,8 @@ function App() {
               <MetallicButton>JOIN TELEGRAM</MetallicButton>
             </div>
           </main>
+          
+          <LiveChat />
         </>
       )}
     </div>
