@@ -36,8 +36,6 @@ export default function DiamondSparkles({ accelerate = false }: DiamondSparklesP
     setSparkles(initialSparkles);
 
     // Continuously add new sparkles
-    let intervalId: NodeJS.Timeout;
-    
     const updateSparkles = () => {
       // Accelerate if transitioning, otherwise slow down gradually
       if (accelerate) {
@@ -53,10 +51,10 @@ export default function DiamondSparkles({ accelerate = false }: DiamondSparklesP
       });
     };
 
-    intervalId = setInterval(updateSparkles, 500);
+    const intervalId = window.setInterval(updateSparkles, 500);
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      window.clearInterval(intervalId);
     };
   }, [accelerate]);
 

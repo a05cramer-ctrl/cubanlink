@@ -28,15 +28,13 @@ function App() {
       console.error('Error playing audio:', error);
     });
     
-    // Show background elements immediately but accelerate them
-    // Show main content after transition animation (2s)
+    // Show main content immediately but hidden (for zoom animation)
+    setShowMain(true);
+    
+    // Reset transition state after animation completes to slow down background
     setTimeout(() => {
-      setShowMain(true);
-      // Reset transition state after animation completes to slow down background
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 100);
-    }, 2000);
+      setIsTransitioning(false);
+    }, 2100);
   };
 
   return (
