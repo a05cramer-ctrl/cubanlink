@@ -17,16 +17,22 @@ function App() {
   const handleIntroEnter = () => {
     setIsTransitioning(true);
     
-    // Start music at 19 seconds
+    // Start music at 19 seconds INSTANTLY - no delay
     if (!audioRef.current) {
       audioRef.current = new Audio(musicFile);
-      audioRef.current.volume = 0.7; // Set volume (0.0 to 1.0)
+      audioRef.current.volume = 1.0; // Maximum volume (0.0 to 1.0)
       audioRef.current.loop = true; // Loop the song
+      audioRef.current.preload = 'auto'; // Preload for instant start
     }
-    audioRef.current.currentTime = 19; // Start at 19 seconds
-    audioRef.current.play().catch((error) => {
-      console.error('Error playing audio:', error);
-    });
+    
+    // Set time and play immediately
+    audioRef.current.currentTime = 19;
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.error('Error playing audio:', error);
+      });
+    }
     
     // Show main content immediately but hidden (for zoom animation)
     setShowMain(true);
