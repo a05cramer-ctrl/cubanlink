@@ -95,7 +95,7 @@ function App() {
 
             <div className="footer-text">
               <a href="https://t.me/cubanlink" target="_blank" rel="noopener noreferrer">
-                <p>Ca:</p>
+                <p>Ca: GMjD97aKV2sLQnD7GdEC8phk7zJfABNzTPAAbi3Ypump</p>
               </a>
             </div>
           </main>
