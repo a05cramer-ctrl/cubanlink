@@ -92,6 +92,10 @@ function App() {
               <MetallicButton>BUY NOW</MetallicButton>
               <MetallicButton href="https://x.com/LinkCuban45020" target="_blank" rel="noopener noreferrer">JOIN COMMUNITY</MetallicButton>
             </div>
+
+            <div className="footer-text">
+              <p>Ca: DL57DDFzGPEjvFZTACtuF2yRMQBmUEyvSqpF94ATbonk</p>
+            </div>
           </main>
           
           {/* <LiveChat /> */}
