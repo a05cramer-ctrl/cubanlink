@@ -94,7 +94,7 @@ function App() {
             </div>
 
             <div className="footer-text">
-              <p>Ca: G7WkCgDdUEMcLWiQk1sDyuA49MyzaBc4NyniUPpDbonk</p>
+              <p>Ca: 8GqZh2wKaugxshznDmbtKCaGRyzDPLfTDqGtwSxybonk</p>
             </div>
           </main>
           
